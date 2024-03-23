@@ -284,6 +284,14 @@ PlayerEvents:
 	xor a
 	ld [wLandmarkSignTimer], a
 
+	; Have player stand (resets running sprite to standing if event starts while running)
+	ld a, [wPlayerState]
+	cp PLAYER_RUN
+	jr nz, .ok2
+	ld a, PLAYER_NORMAL
+	ld [wPlayerState], a
+	farcall UpdatePlayerSprite
+
 .ok2
 	scf
 	ret
@@ -991,7 +999,7 @@ DoFossilStep:
 
 	dec a
 	ld [wFossilStepCount], a
-	ret 
+	ret
 
 DoPlayerEvent:
 	ld a, [wScriptRunning]
@@ -1334,7 +1342,7 @@ ChooseWildEncounter_BugContestOrSafariZone::
 	ld a, [hl]
 	cp -1
 	ret z
-	
+
 	push hl
 
 ; hl = -[hl]
@@ -1363,10 +1371,10 @@ ChooseWildEncounter_BugContestOrSafariZone::
 	pop hl ; hl = start of data
 ; (hl - de) == 0000?
 	jr z, .find_time_of_day ; got map
-	
+
 	add hl, bc ; next map
 	jr .find_map_loop
-	
+
 .find_time_of_day
 ; move to start of table
 	inc hl
@@ -1384,7 +1392,7 @@ ChooseWildEncounter_BugContestOrSafariZone::
 	ld de, 10*4
 .got_time_of_day
 	add hl, de
-	
+
 ; Pick a random mon
 
 .pick_random_number_loop
